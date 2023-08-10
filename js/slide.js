@@ -56,12 +56,12 @@
             // console.log( slideWrap.offset().left );
 
             // 터치 스와이프 이벤트
+            // 데스크탑 : 마우스 터치 스와이프 이벤트
+            // 데스크탑 : 마우스 터치 드래그 앤 드롭
             slideContainer.on({
                 mousedown(e){
                     winW = $(window).innerWidth(); // 마우스 다운하면 창너비 가져오기
                     sizeX = winW / 2;
-                    console.log(winW);
-                    console.log(sizeX);
                     mouseDown = e.clientX; 
                     // 슬라이드랩퍼박스 좌측 좌표값 -1903
                     // 계속 드래그시 슬라이드 박스 좌측값 설정한다.
@@ -105,7 +105,7 @@
             })
 
             // slideContainer 영역을 벗어나면  mouseup의 예외처리
-            // 도큐먼트에서 예외처리
+            // 데스크탑 도큐먼트에서 예외처리
             $(document).on({
                 mouseup(e){
                     if(!mDown) return;
@@ -130,6 +130,76 @@
                     slideView.css({ cursor: 'grab' }); // 놓는다 손바닥 펼친다.
                 }
             });
+
+
+            
+            // 테블릿 & 모바일 : 손가락(핑거링) 터치 스와이프 이벤트 
+            // 테블릿 & 모바일 : 손가락(핑거링) 드래그 앤 드롭
+            slideContainer.on({
+                touchstart(e){
+
+                    // console.log( e );
+
+                    winW = $(window).innerWidth(); // 마우스 다운하면 창너비 가져오기
+                    sizeX = winW / 3;
+                    mouseDown = e.originalEvent.changedTouches[0].clientX; 
+                    // 슬라이드랩퍼박스 좌측 좌표값 -1903
+                    // 계속 드래그시 슬라이드 박스 좌측값 설정한다.
+                    dragStart = e.originalEvent.changedTouches[0].clientX - (slideWrap.offset().left+winW);  // 좌측끝 0 시작
+                    mDown = true; // 1. 드래그 시작 
+                    slideView.css({ cursor: 'grabbing' }); // 잡는다 (드래그)
+                },
+                touchend(e){
+                    mouseUp = e.originalEvent.changedTouches[0].clientX;        
+                    
+                    if( mouseDown-mouseUp > sizeX ){ // 900초과 => 900 이하
+                        clearInterval(setId); // 클릭시 일시중지
+                        if(!slideWrap.is(':animated')){
+                            nextCount();
+                        }                            
+                    }
+                    
+                    if( mouseDown-mouseUp < -sizeX ){  // -900 미만 => -900이상
+                        clearInterval(setId); // 클릭시 일시중지
+                        if(!slideWrap.is(':animated')){
+                            prevCount();
+                        }                            
+                    }
+
+                    // -900 >= 이상이고 <= 900 이하이면 원래대로 제자리로 찾아간다.
+                    if(  mouseDown-mouseUp >= -sizeX  &&  mouseDown-mouseUp <= sizeX ){
+                        mainSlide();
+                    }
+
+                    mDown = false;  // 2. 드래그 끝을 알려주는 마우스 업상태
+                    slideView.css({ cursor: 'grab' }); // 놓는다 손바닥 펼친다.
+                },
+                touchmove(e){
+                    if(!mDown) return;   // 3. true가 아니면 마우스 다운이 있어야만 드래그 가능                 
+                    // if(mDown!==true) return;   // true가 아니면 마우스 다운이 있어야만 드래그 가능                 
+                    // if(mDown===false) return;   // false 이면 마우스 다운이 있어야만 드래그 가능                 
+                                         
+                    dragEnd = e.originalEvent.changedTouches[0].clientX; // 4. 드래그 끝 좌표값
+                    slideWrap.css({left:  dragEnd-dragStart }); // 5. 슬라이드 드래그 이동 디롭( 드래그끝 좌표값 - 드래그시작 좌표값 )
+                }
+            })
+
+
+            // 손가락 터치 이벤트 확인하기(테스트하기) 
+            // => 태블릿과 모바일에서만 이벤트 동작
+            // originalEvent: TouchEvent, 
+            // type: 'touchstart',
+            // slideContainer.on({
+            //     touchstart(event){
+            //         console.log( event.originalEvent.changedTouches[0].clientX );
+            //     },
+            //     touchend(event){
+            //         console.log( event.originalEvent.changedTouches[0].clientX );
+            //     },
+            //     touchmove(e){
+            //         console.log( e.originalEvent.changedTouches[0].clientX );
+            //     }
+            // });
 
 
 
@@ -225,7 +295,7 @@
             let dragEnd = null;
             let mDown = false;
             let winW = $(window).innerWidth(); // 창너비=> 슬라이드1개의 너비
-            let sizeX = 300;  // 드래그 길이
+            let sizeX = 100;  // 드래그 길이
             let offsetL =   slideWrap.offset().left;  // 318 
             let slideWidth;
             // slideWrap.offset().left 좌측 좌표값
@@ -262,7 +332,7 @@
 
 
 
-
+            // 데스크탑 터치 스와이프 & 드래그 & 드롭
             slideContainer.on({
                 mousedown(e){
                     slideView.css({ cursor: 'grabbing' }); // 잡는다
@@ -321,8 +391,39 @@
                 }
             })
 
+            // 태블릿, 모바일 터치 스와이프 & 드래그 & 드롭
+            slideContainer.on({
+                touchstart(e){
+                    slideView.css({ cursor: 'grabbing' }); // 잡는다
+                    mDown = true;
+                    touchStart = e.originalEvent.changedTouches[0].clientX;
+                    dragStart = e.originalEvent.changedTouches[0].clientX - (slideWrap.offset().left-offsetL);
+                },
+                touchend(e){
+                    touchEnd = e.originalEvent.changedTouches[0].clientX;
+                    if(touchStart-touchEnd > sizeX){
+                        nextCount();
+                    }
+                    if(touchStart-touchEnd < -sizeX){
+                        prevCount();
+                    }
+                    
+                    // -300 >= 이상이고 <= 300 이하이면 원래대로 제자리로 찾아간다.
+                    if(  touchStart-touchEnd >= -sizeX  &&  touchStart-touchEnd <= sizeX ){
+                        mainSlide();
+                    }
+                    slideView.css({ cursor: 'grab' }); // 놓는다
+                    mDown = false;
+                },
+                touchmove(e){
+                    if(!mDown) return;
 
+                    dragEnd = e.originalEvent.changedTouches[0].clientX;
 
+                    slideWrap.css({left: dragEnd - dragStart });
+
+                }
+            });   
 
 
             // 셀렉트버튼 클릭 이벤트 => 토글 이벤트
