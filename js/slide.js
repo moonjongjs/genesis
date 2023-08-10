@@ -317,13 +317,15 @@
                         for(let i=0; i<n; i++){
                             pageBtn.eq(i).css({ display: 'block' }); // 8개만 보임
                         }  
-                        cnt=0;                      
+                       
+                        if(cnt>=7){
+                            cnt=7;
+                        }                     
                     }
                     else{ // 1280 이하 에서는 슬라이드 1개
                         slideWidth = (section2Container.innerWidth()-0+20+20)/1; 
                         n = slide.length;  // 10/1
                         pageBtn.css({ display: 'block' }); // 10개 모두 보임                        
-                        cnt=0;
                     }                                          
                 }
                 else{ // 1642 초과(보다 크다)
