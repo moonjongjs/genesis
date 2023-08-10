@@ -228,7 +228,7 @@
             function autoTimer(){
                 setId = setInterval(nextCount, 7000);
             }
-            //autoTimer();
+            autoTimer();
 
             // 4. 페이지 이벤트 함수
             function pageEvent(){
