@@ -1,3 +1,6 @@
+닷홈
+moonjong.dothome.co.kr/genesis
+
 리파지토리  
 genesis
 
@@ -102,7 +105,7 @@ clear 화면지우기(청소)
 git  add  .
 
 // 6. 커밋 
-git commit  -m  '제네시스 메인슬라이드'
+git commit  -m  '모바일 터치이벤트 추가'
 
 // 7. 푸쉬
 git push  origin  master
